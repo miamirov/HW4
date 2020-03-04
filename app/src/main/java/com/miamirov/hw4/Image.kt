@@ -1,6 +1,8 @@
 package com.miamirov.hw4
 
 import android.graphics.Bitmap
+import android.os.Parcel
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +13,45 @@ import kotlinx.android.synthetic.main.list_item.view.*
 
 data class Image(
     var preview: Bitmap? = null,
-    var description: String = "",
-    var previewUrl: String = "",
-    var highResUrl: String = "",
+    var description: String? = "",
+    var previewUrl: String? = "",
+    var highResUrl: String? = "",
     var likeCount: Int = 0,
     var rePostCount: Int = 0
-)
+):Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readParcelable(Bitmap::class.java.classLoader),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readInt(),
+        parcel.readInt()
+    ) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(preview, flags)
+        parcel.writeString(description)
+        parcel.writeString(previewUrl)
+        parcel.writeString(highResUrl)
+        parcel.writeInt(likeCount)
+        parcel.writeInt(rePostCount)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Image> {
+        override fun createFromParcel(parcel: Parcel): Image {
+            return Image(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Image?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
 
 class ImageListViewHolder(val root: View) : RecyclerView.ViewHolder(root) {
     val imagePreview: ImageView = root.image_preview

@@ -16,9 +16,9 @@ import java.lang.ref.WeakReference
 import java.net.URL
 
 const val API_PREF = "https://api.vk.com/method/photos.search?access_token="
-const val QUERY_SIZE = 20
+const val QUERY_SIZE = 10
 const val API_VERSION = "5.102"
-
+const val STATE = "STATE"
 class MainActivity : AppCompatActivity() {
 
     private var asyncTask: ImageLoader? = null
@@ -41,6 +41,19 @@ class MainActivity : AppCompatActivity() {
 
         asyncTask?.attachActivity(this)
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList(STATE, queryList)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        queryList = savedInstanceState.getParcelableArrayList(STATE)
+        setImageList(queryList)
+    }
+
+
 
     override fun onRetainCustomNonConfigurationInstance(): ImageLoader? {
         return asyncTask
@@ -141,7 +154,8 @@ class MainActivity : AppCompatActivity() {
                         previewUrl = imageSizes[0].asJsonObject.get("url").asString
                         highResUrl =
                             imageSizes[imageSizes.size() - 1].asJsonObject.get("url").asString
-                        preview = downloadPreview(previewUrl)
+                        if (previewUrl != null)
+                            preview = downloadPreview(previewUrl!!)
                     })
                 }
                 return responseResult
